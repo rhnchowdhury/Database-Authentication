@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+var encrypt = require("mongoose-encryption");
 const userModel = require("./models/user.model");
 require("dotenv").config();
 const app = express();
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
+// user created
 app.post("/register", async (req, res) => {
   try {
     const newUser = new userModel(req.body);

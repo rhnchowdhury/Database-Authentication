@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
+var encrypt = require("mongoose-encryption");
+require("dotenv").config();
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     require: true,
@@ -18,5 +20,9 @@ const userSchema = mongoose.Schema({
     default: Date.now(),
   },
 });
+
+// password encryption
+const encKey = process.env.ENC_SECRET_KEY;
+userSchema.plugin(encrypt, { secret: encKey, encryptedFields: ["password"] });
 
 module.exports = mongoose.model("user", userSchema);
