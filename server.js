@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-var encrypt = require("mongoose-encryption");
 const userModel = require("./models/user.model");
 require("dotenv").config();
 const app = express();
