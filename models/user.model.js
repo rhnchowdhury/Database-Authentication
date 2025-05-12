@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-var encrypt = require("mongoose-encryption");
+// var encrypt = require("mongoose-encryption");
 require("dotenv").config();
 
 const userSchema = new mongoose.Schema({
@@ -21,8 +21,8 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// password encryption using mongoose encryption
-const encKey = process.env.ENC_SECRET_KEY;
-userSchema.plugin(encrypt, { secret: encKey, encryptedFields: ["password"] });
+// //! password encryption using mongoose encryption
+// const encKey = process.env.ENC_SECRET_KEY;
+// userSchema.plugin(encrypt, { secret: encKey, encryptedFields: ["password"] });
 
 module.exports = mongoose.model("user", userSchema);

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const userModel = require("./models/user.model");
+const md5 = require("md5");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 4000;
@@ -29,7 +30,13 @@ app.get("/", (req, res) => {
 // user created
 app.post("/register", async (req, res) => {
   try {
-    const newUser = new userModel(req.body);
+    // const newUser = new userModel(req.body);
+    //! Hashing password
+    const newUser = new userModel({
+      email: req.body.email,
+      password: md5(req.body.email),
+    });
+
     await newUser.save();
     res.send(newUser);
   } catch (error) {
@@ -39,7 +46,10 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    // const { email, password } = req.body;
+    //! Hashing password
+    const email = req.body.email;
+    const password = md5(req.body.email);
     const user = await userModel.findOne({ email: email });
     if (user && user.password === password) {
       res.json({ message: "user found" });
@@ -49,6 +59,12 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     res.json(error.message);
   }
+});
+
+// user get
+app.get("/user", async (req, res) => {
+  const user = await userModel.find();
+  res.send(user);
 });
 
 // route not found error
