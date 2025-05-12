@@ -2,7 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const userModel = require("./models/user.model");
-const md5 = require("md5");
+// const md5 = require("md5");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 4000;
@@ -32,13 +34,23 @@ app.post("/register", async (req, res) => {
   try {
     // const newUser = new userModel(req.body);
     //! Hashing password
-    const newUser = new userModel({
-      email: req.body.email,
-      password: md5(req.body.email),
+    // const newUser = new userModel({
+    // name: req.body.name,
+    //   email: req.body.email,
+    //   password: md5(req.body.email),
+    // });
+    //! Hashing & salting password
+    bcrypt.hash(req.body.password, saltRounds, async function (err, hash) {
+      const newUser = new userModel({
+        name: req.body.name,
+        email: req.body.email,
+        password: hash,
+      });
+      await newUser.save();
+      res.send(newUser);
     });
-
-    await newUser.save();
-    res.send(newUser);
+    // await newUser.save();
+    // res.send(newUser);
   } catch (error) {
     res.json(error.message);
   }
@@ -47,12 +59,22 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     // const { email, password } = req.body;
+    // const user = await userModel.findOne({ email: email });
     //! Hashing password
-    const email = req.body.email;
-    const password = md5(req.body.email);
+    // const email = req.body.email;
+    // const password = md5(req.body.email);
+    // const user = await userModel.findOne({ email: email });
+    // if (user && user.password === password) {
+    //! Hashing & salting password
+    const { email, password } = req.body;
     const user = await userModel.findOne({ email: email });
-    if (user && user.password === password) {
-      res.json({ message: "user found" });
+    if (user) {
+      bcrypt.compare(password, user.password, function (err, result) {
+        if (result == true) {
+          res.json({ message: "user found" });
+        }
+      });
+      // res.json({ message: "user found" });
     } else {
       res.json({ message: "user not found" });
     }
